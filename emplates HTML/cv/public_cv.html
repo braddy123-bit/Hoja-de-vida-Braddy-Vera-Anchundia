@@ -1,0 +1,217 @@
+{% extends 'curriculum/base.html' %}
+{% load static %}
+
+{% block title %}{{ perfil.nombre_completo }} - CV Profesional{% endblock %}
+
+{% block meta_description %}CV de {{ perfil.nombre_completo }} - {{ perfil.titulo_profesional }}. {{ perfil.resumen_profesional|truncatewords:20 }}{% endblock %}
+
+{% block main_class %}container-fluid p-0{% endblock %}
+
+{% block content %}
+
+<!-- Header con gradiente -->
+<div class="bg-gradient text-white py-5 mb-4" style="background: linear-gradient(135deg, #2E7D32 0%, #1B5E20 100%);">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-3 text-center mb-3 mb-md-0">
+                {% if perfil.foto %}
+                    <img src="{{ perfil.foto.url }}" alt="{{ perfil.nombre_completo }}" class="rounded-circle border border-4 border-white" width="180" height="180" style="object-fit: cover;">
+                {% else %}
+                    <div class="rounded-circle border border-4 border-white bg-white text-primary d-inline-flex align-items-center justify-content-center" style="width: 180px; height: 180px; font-size: 64px;">
+                        {{ perfil.nombres.0 }}{{ perfil.apellidos.0 }}
+                    </div>
+                {% endif %}
+            </div>
+            <div class="col-md-9">
+                <h1 class="display-4 fw-bold mb-2">{{ perfil.nombre_completo }}</h1>
+                <h4 class="mb-3">{{ perfil.titulo_profesional }}</h4>
+                <p class="lead mb-3">{{ perfil.resumen_profesional }}</p>
+                
+                <div class="d-flex flex-wrap gap-3">
+                    <span class="badge bg-white text-dark px-3 py-2">
+                        <i class="bi bi-geo-alt-fill me-1"></i> {{ perfil.ciudad }}, {{ perfil.pais }}
+                    </span>
+                    <span class="badge bg-white text-dark px-3 py-2">
+                        <i class="bi bi-briefcase-fill me-1"></i> {{ perfil.anos_experiencia }} años de experiencia
+                    </span>
+                    {% if perfil.linkedin %}
+                    <a href="{{ perfil.linkedin }}" target="_blank" class="badge bg-white text-primary text-decoration-none px-3 py-2">
+                        <i class="bi bi-linkedin me-1"></i> LinkedIn
+                    </a>
+                    {% endif %}
+                    {% if perfil.github %}
+                    <a href="{{ perfil.github }}" target="_blank" class="badge bg-white text-dark text-decoration-none px-3 py-2">
+                        <i class="bi bi-github me-1"></i> GitHub
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <div class="row">
+        
+        <!-- Experiencia Profesional -->
+        {% if experiencias %}
+        <div class="col-lg-8 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h4 class="fw-bold mb-4">
+                        <i class="bi bi-briefcase-fill text-success me-2"></i>
+                        Experiencia Profesional
+                    </h4>
+                    
+                    {% for exp in experiencias %}
+                    <div class="{% if not forloop.last %}mb-4 pb-4 border-bottom{% endif %}">
+                        <h5 class="fw-bold mb-1">{{ exp.cargo }}</h5>
+                        <p class="text-success mb-2">{{ exp.empresa }}</p>
+                        <p class="text-muted small mb-2">
+                            <i class="bi bi-calendar me-1"></i>
+                            {{ exp.fecha_inicio|date:"M Y" }} - 
+                            {% if exp.trabajo_actual %}Presente{% else %}{{ exp.fecha_fin|date:"M Y" }}{% endif %}
+                            | {{ exp.ciudad }}, {{ exp.pais }}
+                        </p>
+                        <p class="mb-2">{{ exp.descripcion }}</p>
+                        {% if exp.logros %}
+                        <p class="mb-2"><strong>Logros:</strong> {{ exp.logros }}</p>
+                        {% endif %}
+                        {% if exp.tecnologias_usadas %}
+                        <p class="text-muted small mb-0">
+                            <i class="bi bi-code-slash me-1"></i> {{ exp.tecnologias_usadas }}
+                        </p>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            
+            <!-- Formación Académica -->
+            {% if formacion %}
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-3">
+                        <i class="bi bi-mortarboard-fill text-info me-2"></i>
+                        Formación Académica
+                    </h5>
+                    
+                    {% for edu in formacion %}
+                    <div class="{% if not forloop.last %}mb-3 pb-3 border-bottom{% endif %}">
+                        <h6 class="fw-bold mb-1">{{ edu.titulo_obtenido }}</h6>
+                        <p class="text-info small mb-1">{{ edu.institucion }}</p>
+                        <p class="text-muted small mb-0">
+                            {{ edu.fecha_inicio|date:"Y" }} - {% if edu.fecha_fin %}{{ edu.fecha_fin|date:"Y" }}{% else %}Presente{% endif %}
+                        </p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Habilidades -->
+            {% if habilidades %}
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-3">
+                        <i class="bi bi-star-fill text-warning me-2"></i>
+                        Habilidades
+                    </h5>
+                    
+                    {% for hab in habilidades %}
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="small fw-bold">{{ hab.nombre }}</span>
+                            <span class="small text-muted">{{ hab.nivel }}%</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-warning" style="width: {{ hab.nivel }}%"></div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Contacto -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-3">
+                        <i class="bi bi-envelope-fill text-primary me-2"></i>
+                        Contacto
+                    </h5>
+                    <p class="small mb-2">
+                        <i class="bi bi-envelope text-muted me-2"></i>
+                        <a href="mailto:{{ perfil.email }}" class="text-decoration-none">{{ perfil.email }}</a>
+                    </p>
+                    <p class="small mb-0">
+                        <i class="bi bi-geo-alt text-muted me-2"></i>
+                        {{ perfil.ciudad }}, {{ perfil.pais }}
+                    </p>
+                </div>
+            </div>
+            
+        </div>
+        
+    </div>
+    
+    <!-- Proyectos -->
+    {% if proyectos %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h4 class="fw-bold mb-4">
+                        <i class="bi bi-folder-fill text-danger me-2"></i>
+                        Proyectos Destacados
+                    </h4>
+                    
+                    <div class="row g-4">
+                        {% for proy in proyectos %}
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card border h-100">
+                                {% if proy.imagen %}
+                                <img src="{{ proy.imagen.url }}" class="card-img-top" alt="{{ proy.nombre }}" style="height: 200px; object-fit: cover;">
+                                {% endif %}
+                                <div class="card-body">
+                                    <h6 class="fw-bold">{{ proy.nombre }}</h6>
+                                    <p class="small text-muted mb-3">{{ proy.descripcion_corta }}</p>
+                                    <p class="small mb-3"><strong>Tecnologías:</strong> {{ proy.tecnologias }}</p>
+                                    <div class="d-flex gap-2">
+                                        {% if proy.url_demo %}
+                                        <a href="{{ proy.url_demo }}" class="btn btn-sm btn-primary" target="_blank">
+                                            <i class="bi bi-eye"></i> Ver Demo
+                                        </a>
+                                        {% endif %}
+                                        {% if proy.url_repositorio %}
+                                        <a href="{{ proy.url_repositorio }}" class="btn btn-sm btn-outline-dark" target="_blank">
+                                            <i class="bi bi-github"></i> Código
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Certificaciones -->
+    {% if certificaciones %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h4 class="fw-bold mb-4">
+                        <i class="bi bi-award-fill text-primary me-2"></i>
+                        Certificaciones
+                    </h
