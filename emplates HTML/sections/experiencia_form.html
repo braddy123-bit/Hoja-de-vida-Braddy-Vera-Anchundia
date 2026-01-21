@@ -1,0 +1,74 @@
+{% extends 'curriculum/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}{% if object %}Editar{% else %}Agregar{% endif %} Experiencia Profesional{% endblock %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        
+        <div class="mb-4">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'curriculum:dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item active">{% if object %}Editar{% else %}Agregar{% endif %} Experiencia</li>
+                </ol>
+            </nav>
+            
+            <h2 class="fw-bold">
+                <i class="bi bi-briefcase text-success me-2"></i>
+                {% if object %}Editar{% else %}Agregar{% endif %} Experiencia Profesional
+            </h2>
+        </div>
+        
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-check-circle me-2"></i>
+                            Guardar
+                        </button>
+                        <a href="{% url 'curriculum:dashboard' %}" class="btn btn-outline-secondary">
+                            Cancelar
+                        </a>
+                        {% if object %}
+                        <a href="{% url 'curriculum:eliminar_experiencia' object.pk %}" class="btn btn-outline-danger ms-auto" onclick="return confirm('¿Estás seguro de eliminar esta experiencia?')">
+                            <i class="bi bi-trash me-2"></i>
+                            Eliminar
+                        </a>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Ocultar fecha fin si trabajo actual está marcado
+    const trabajoActual = document.querySelector('input[name="trabajo_actual"]');
+    const fechaFin = document.querySelector('input[name="fecha_fin"]');
+    
+    if (trabajoActual && fechaFin) {
+        trabajoActual.addEventListener('change', function() {
+            if (this.checked) {
+                fechaFin.value = '';
+                fechaFin.closest('.form-group').style.opacity = '0.5';
+                fechaFin.disabled = true;
+            } else {
+                fechaFin.closest('.form-group').style.opacity = '1';
+                fechaFin.disabled = false;
+            }
+        });
+    }
+</script>
+{% endblock %}
