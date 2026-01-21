@@ -1,0 +1,53 @@
+{% extends 'curriculum/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}{% if object %}Editar{% else %}Agregar{% endif %} Formación Académica{% endblock %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        
+        <div class="mb-4">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'curriculum:dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item active">{% if object %}Editar{% else %}Agregar{% endif %} Formación</li>
+                </ol>
+            </nav>
+            
+            <h2 class="fw-bold">
+                <i class="bi bi-mortarboard text-primary me-2"></i>
+                {% if object %}Editar{% else %}Agregar{% endif %} Formación Académica
+            </h2>
+        </div>
+        
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle me-2"></i>
+                            Guardar
+                        </button>
+                        <a href="{% url 'curriculum:dashboard' %}" class="btn btn-outline-secondary">
+                            Cancelar
+                        </a>
+                        {% if object %}
+                        <a href="{% url 'curriculum:eliminar_educacion' object.pk %}" class="btn btn-outline-danger ms-auto" onclick="return confirm('¿Estás seguro de eliminar esta formación?')">
+                            <i class="bi bi-trash me-2"></i>
+                            Eliminar
+                        </a>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+{% endblock %}
