@@ -1,0 +1,259 @@
+{% extends 'curriculum/base.html' %}
+{% load static %}
+
+{% block title %}Inicio - CV Profesional{% endblock %}
+
+{% block main_class %}{% endblock %}
+
+{% block content %}
+
+<!-- Hero Section -->
+<section class="bg-gradient text-white py-5" style="background: linear-gradient(135deg, #2E7D32 0%, #1B5E20 100%);">
+    <div class="container py-5">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <h1 class="display-4 fw-bold mb-3">
+                    Crea tu CV Profesional
+                </h1>
+                <p class="lead mb-4">
+                    Sistema moderno para crear, gestionar y descargar tu currículum vitae de forma profesional. 
+                    Completamente automatizado y fácil de usar.
+                </p>
+                <div class="d-flex gap-3">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'curriculum:dashboard' %}" class="btn btn-light btn-lg">
+                            <i class="bi bi-speedometer2 me-2"></i> Ir al Dashboard
+                        </a>
+                    {% else %}
+                        <a href="{% url 'curriculum:registro' %}" class="btn btn-light btn-lg">
+                            <i class="bi bi-person-plus me-2"></i> Comenzar Gratis
+                        </a>
+                        <a href="{% url 'curriculum:login' %}" class="btn btn-outline-light btn-lg">
+                            <i class="bi bi-box-arrow-in-right me-2"></i> Iniciar Sesión
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-lg-6 text-center">
+                <i class="bi bi-file-earmark-person display-1" style="font-size: 12rem; opacity: 0.2;"></i>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Características -->
+<section class="py-5 bg-white">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">Características Principales</h2>
+            <p class="text-muted">Todo lo que necesitas para crear un CV profesional</p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100 text-center p-4">
+                    <div class="mb-3">
+                        <i class="bi bi-lightning-fill text-primary" style="font-size: 3rem;"></i>
+                    </div>
+                    <h5 class="fw-bold">Completamente Automatizado</h5>
+                    <p class="text-muted mb-0">
+                        El sistema procesa imágenes, calcula experiencia y genera PDFs automáticamente. 
+                        Solo debes llenar los formularios.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100 text-center p-4">
+                    <div class="mb-3">
+                        <i class="bi bi-file-pdf-fill text-danger" style="font-size: 3rem;"></i>
+                    </div>
+                    <h5 class="fw-bold">Generación de PDF</h5>
+                    <p class="text-muted mb-0">
+                        Descarga tu CV en formato PDF profesional con un solo clic. 
+                        Listo para enviar a empleadores.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100 text-center p-4">
+                    <div class="mb-3">
+                        <i class="bi bi-phone-fill text-success" style="font-size: 3rem;"></i>
+                    </div>
+                    <h5 class="fw-bold">Diseño Responsive</h5>
+                    <p class="text-muted mb-0">
+                        Accede desde cualquier dispositivo. Tu CV se adapta perfectamente 
+                        a móviles, tablets y computadoras.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100 text-center p-4">
+                    <div class="mb-3">
+                        <i class="bi bi-shield-check-fill text-info" style="font-size: 3rem;"></i>
+                    </div>
+                    <h5 class="fw-bold">Seguro y Privado</h5>
+                    <p class="text-muted mb-0">
+                        Tus datos están protegidos. Decide si tu CV es público o privado. 
+                        Control total sobre tu información.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100 text-center p-4">
+                    <div class="mb-3">
+                        <i class="bi bi-graph-up-arrow text-warning" style="font-size: 3rem;"></i>
+                    </div>
+                    <h5 class="fw-bold">Seguimiento de Progreso</h5>
+                    <p class="text-muted mb-0">
+                        Dashboard con estadísticas y porcentaje de completitud. 
+                        Visualiza tu progreso en tiempo real.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100 text-center p-4">
+                    <div class="mb-3">
+                        <i class="bi bi-images text-primary" style="font-size: 3rem;"></i>
+                    </div>
+                    <h5 class="fw-bold">Portafolio Visual</h5>
+                    <p class="text-muted mb-0">
+                        Agrega imágenes de tus proyectos, certificados y más. 
+                        Procesamiento automático de imágenes.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Secciones del CV -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">Secciones de tu CV</h2>
+            <p class="text-muted">Crea un currículum completo y profesional</p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="text-center">
+                    <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="bi bi-person-badge fs-2"></i>
+                    </div>
+                    <h6 class="fw-bold">Perfil Profesional</h6>
+                    <p class="text-muted small">Datos personales, foto, contacto y resumen profesional</p>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-3">
+                <div class="text-center">
+                    <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="bi bi-mortarboard fs-2"></i>
+                    </div>
+                    <h6 class="fw-bold">Formación Académica</h6>
+                    <p class="text-muted small">Títulos, instituciones, promedios y certificados</p>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-3">
+                <div class="text-center">
+                    <div class="bg-info text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="bi bi-briefcase fs-2"></i>
+                    </div>
+                    <h6 class="fw-bold">Experiencia Laboral</h6>
+                    <p class="text-muted small">Trabajos, cargos, logros y tecnologías usadas</p>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-3">
+                <div class="text-center">
+                    <div class="bg-warning text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="bi bi-star fs-2"></i>
+                    </div>
+                    <h6 class="fw-bold">Habilidades</h6>
+                    <p class="text-muted small">Habilidades técnicas, blandas, idiomas y niveles</p>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-3">
+                <div class="text-center">
+                    <div class="bg-danger text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="bi bi-folder fs-2"></i>
+                    </div>
+                    <h6 class="fw-bold">Proyectos</h6>
+                    <p class="text-muted small">Portafolio de proyectos con imágenes y enlaces</p>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-3">
+                <div class="text-center">
+                    <div class="bg-secondary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="bi bi-award fs-2"></i>
+                    </div>
+                    <h6 class="fw-bold">Certificaciones</h6>
+                    <p class="text-muted small">Cursos, certificados y credenciales verificables</p>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-3">
+                <div class="text-center">
+                    <div class="bg-dark text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="bi bi-people fs-2"></i>
+                    </div>
+                    <h6 class="fw-bold">Referencias</h6>
+                    <p class="text-muted small">Referencias profesionales con testimonios</p>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-3">
+                <div class="text-center">
+                    <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="bi bi-graph-up fs-2"></i>
+                    </div>
+                    <h6 class="fw-bold">Estadísticas</h6>
+                    <p class="text-muted small">Dashboard con métricas y progreso del CV</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Estadísticas -->
+<section class="py-5 bg-white">
+    <div class="container">
+        <div class="row text-center g-4">
+            <div class="col-md-4">
+                <h2 class="display-4 fw-bold text-primary">{{ total_usuarios }}</h2>
+                <p class="text-muted">Usuarios Registrados</p>
+            </div>
+            <div class="col-md-4">
+                <h2 class="display-4 fw-bold text-success">{{ cvs_publicos }}</h2>
+                <p class="text-muted">CVs Públicos</p>
+            </div>
+            <div class="col-md-4">
+                <h2 class="display-4 fw-bold text-info">100%</h2>
+                <p class="text-muted">Gratis</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Final -->
+{% if not user.is_authenticated %}
+<section class="py-5 bg-gradient text-white" style="background: linear-gradient(135deg, #1976D2 0%, #0D47A1 100%);">
+    <div class="container text-center">
+        <h2 class="fw-bold mb-3">¿Listo para crear tu CV profesional?</h2>
+        <p class="lead mb-4">Regístrate ahora y comienza a construir tu futuro</p>
+        <a href="{% url 'curriculum:registro' %}" class="btn btn-light btn-lg">
+            <i class="bi bi-rocket-takeoff me-2"></i> Comenzar Ahora
+        </a>
+    </div>
+</section>
+{% endif %}
+
+{% endblock %}
