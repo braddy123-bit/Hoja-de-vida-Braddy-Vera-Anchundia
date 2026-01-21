@@ -1,0 +1,58 @@
+{% extends 'curriculum/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}{% if object %}Editar{% else %}Agregar{% endif %} Referencia{% endblock %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-lg-7 mx-auto">
+        
+        <div class="mb-4">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'curriculum:dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item active">{% if object %}Editar{% else %}Agregar{% endif %} Referencia</li>
+                </ol>
+            </nav>
+            
+            <h2 class="fw-bold">
+                <i class="bi bi-people text-secondary me-2"></i>
+                {% if object %}Editar{% else %}Agregar{% endif %} Referencia Profesional
+            </h2>
+        </div>
+        
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-secondary">
+                            <i class="bi bi-check-circle me-2"></i>
+                            Guardar Referencia
+                        </button>
+                        <a href="{% url 'curriculum:dashboard' %}" class="btn btn-outline-secondary">
+                            Cancelar
+                        </a>
+                        {% if object %}
+                        <a href="{% url 'curriculum:eliminar_referencia' object.pk %}" class="btn btn-outline-danger ms-auto" onclick="return confirm('¿Estás seguro?')">
+                            <i class="bi bi-trash me-2"></i>
+                            Eliminar
+                        </a>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="alert alert-warning border-0 mt-3">
+            <i class="bi bi-shield-check me-2"></i>
+            <strong>Privacidad:</strong> Puedes controlar si mostrar o no los datos de contacto de tus referencias.
+        </div>
+        
+    </div>
+</div>
+
+{% endblock %}
