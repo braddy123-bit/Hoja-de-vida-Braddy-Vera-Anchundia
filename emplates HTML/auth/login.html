@@ -1,0 +1,62 @@
+{% extends 'curriculum/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Iniciar Sesión - CV Profesional{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        
+        <div class="card shadow-sm border-0 mt-5">
+            <div class="card-body p-5">
+                
+                <!-- Header -->
+                <div class="text-center mb-4">
+                    <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="bi bi-box-arrow-in-right text-primary" style="font-size: 2.5rem;"></i>
+                    </div>
+                    <h3 class="fw-bold">Iniciar Sesión</h3>
+                    <p class="text-muted">Accede a tu cuenta de CV Profesional</p>
+                </div>
+                
+                <!-- Formulario -->
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    
+                    <button type="submit" class="btn btn-primary w-100 btn-lg mt-3">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>
+                        Iniciar Sesión
+                    </button>
+                </form>
+                
+                <!-- Enlaces adicionales -->
+                <div class="text-center mt-4">
+                    <p class="text-muted mb-2">
+                        <a href="#" class="text-decoration-none">¿Olvidaste tu contraseña?</a>
+                    </p>
+                    <hr>
+                    <p class="text-muted mb-0">
+                        ¿No tienes cuenta? 
+                        <a href="{% url 'curriculum:registro' %}" class="text-decoration-none fw-bold">
+                            Regístrate aquí
+                        </a>
+                    </p>
+                </div>
+                
+            </div>
+        </div>
+        
+        <!-- Info adicional -->
+        <div class="text-center mt-3">
+            <p class="text-muted small">
+                <i class="bi bi-shield-check me-1"></i>
+                Tus datos están protegidos y seguros
+            </p>
+        </div>
+        
+    </div>
+</div>
+
+{% endblock %}
