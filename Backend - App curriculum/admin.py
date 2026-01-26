@@ -1,135 +1,104 @@
-"""
-Configuración del Panel de Administración
-"""
+
 
 from django.contrib import admin
 from django.utils.html import format_html
-from django.urls import reverse
-from django.utils.safestring import mark_safe
 from .models import (
-    PerfilProfesional,
-    FormacionAcademica,
-    ExperienciaProfesional,
-    Habilidad,
-    Proyecto,
-    ReferenciaProfesional,
-    Certificacion
+    DatosPersonales,
+    ExperienciaLaboral,
+    Reconocimiento,
+    CursoRealizado,
+    ProductoAcademico,
+    ProductoLaboral,
+    VentaGarage
 )
 
 
 # ======================================
-# INLINE ADMIN
+# INLINES
 # ======================================
 
-class FormacionAcademicaInline(admin.TabularInline):
-    model = FormacionAcademica
+class ExperienciaLaboralInline(admin.TabularInline):
+    model = ExperienciaLaboral
     extra = 0
-    fields = ['nivel', 'titulo_obtenido', 'institucion', 'fecha_inicio', 'fecha_fin', 'estado']
+    fields = ['cargodesempenado', 'nombrempresa', 'fechainiciogestion', 'fechafingestion', 'activarparaqueseveaenfront']
     readonly_fields = []
 
 
-class ExperienciaProfesionalInline(admin.TabularInline):
-    model = ExperienciaProfesional
+class ReconocimientoInline(admin.TabularInline):
+    model = Reconocimiento
     extra = 0
-    fields = ['cargo', 'empresa', 'fecha_inicio', 'fecha_fin', 'trabajo_actual']
-    readonly_fields = []
+    fields = ['tiporeconocimiento', 'fechareconocimiento', 'entidadpatrocinadora', 'activarparaqueseveaenfront']
 
 
-class HabilidadInline(admin.TabularInline):
-    model = Habilidad
+class CursoRealizadoInline(admin.TabularInline):
+    model = CursoRealizado
     extra = 0
-    fields = ['nombre', 'tipo', 'nivel', 'destacada']
-    readonly_fields = []
-
-
-class ProyectoInline(admin.StackedInline):
-    model = Proyecto
-    extra = 0
-    fields = ['nombre', 'descripcion_corta', 'estado', 'destacado']
-    readonly_fields = []
+    fields = ['nombrecurso', 'fechainicio', 'fechafin', 'entidadpatrocinadora', 'activarparaqueseveaenfront']
 
 
 # ======================================
-# PERFIL PROFESIONAL ADMIN
+# ADMIN: DATOS PERSONALES
 # ======================================
 
-@admin.register(PerfilProfesional)
-class PerfilProfesionalAdmin(admin.ModelAdmin):
+@admin.register(DatosPersonales)
+class DatosPersonalesAdmin(admin.ModelAdmin):
     list_display = [
         'foto_preview',
         'nombre_completo',
-        'usuario',
-        'email',
-        'titulo_profesional',
-        'cv_publico_badge',
+        'numerocedula',
+        'edad',
+        'perfilactivo_badge',
         'fecha_actualizacion'
     ]
     
-    list_filter = [
-        'cv_publico',
-        'nivel_experiencia',
-        'fecha_creacion',
-        'pais',
-        'provincia'
-    ]
+    list_filter = ['perfilactivo', 'sexo', 'estadocivil', 'fecha_creacion']
+    search_fields = ['nombres', 'apellidos', 'numerocedula']
     
-    search_fields = [
-        'nombres',
-        'apellidos',
-        'email',
-        'titulo_profesional',
-        'usuario__username'
-    ]
-    
-    readonly_fields = [
-        'slug',
-        'fecha_creacion',
-        'fecha_actualizacion',
-        'foto_preview_large',
-        'ver_cv_publico'
-    ]
+    readonly_fields = ['slug', 'fecha_creacion', 'fecha_actualizacion', 'foto_preview_large', 'edad']
     
     fieldsets = (
         ('Usuario', {
-            'fields': ('usuario',)
+            'fields': ('usuario', 'descripcionperfil', 'perfilactivo')
         }),
         ('Información Personal', {
             'fields': (
                 'nombres',
                 'apellidos',
-                'fecha_nacimiento',
+                'fechanacimiento',
+                'edad',
                 'nacionalidad',
+                'lugarnacimiento',
+                'numerocedula',
+                'sexo',
+                'estadocivil',
+                'licenciaconducir',
                 'foto',
                 'foto_preview_large'
             )
         }),
         ('Contacto', {
             'fields': (
-                'email',
-                'telefono',
-                'linkedin',
-                'github',
-                'portafolio_web'
+                'telefonoconvencional',
+                'telefonofijo',
+                'direcciontrabajo',
+                'direcciondomiciliaria',
+                'sitioweb'
             )
         }),
-        ('Ubicación', {
-            'fields': ('ciudad', 'provincia', 'pais')
-        }),
-        ('Profesional', {
+        ('⚙️ CONTROL DE SECCIONES EN PDF', {
             'fields': (
-                'titulo_profesional',
-                'nivel_experiencia',
-                'anos_experiencia',
-                'resumen_profesional',
-                'objetivo_profesional'
-            )
+                'mostrar_experiencia_pdf',
+                'mostrar_reconocimientos_pdf',
+                'mostrar_cursos_pdf',
+                'mostrar_productos_academicos_pdf',
+                'mostrar_productos_laborales_pdf',
+                'mostrar_venta_garage_pdf'
+            ),
+            'classes': ('wide',),
+            'description': 'Selecciona qué secciones se mostrarán en el PDF generado'
         }),
         ('Configuración', {
-            'fields': (
-                'cv_publico',
-                'slug',
-                'ver_cv_publico'
-            )
+            'fields': ('slug',)
         }),
         ('Metadata', {
             'fields': ('fecha_creacion', 'fecha_actualizacion'),
@@ -137,12 +106,7 @@ class PerfilProfesionalAdmin(admin.ModelAdmin):
         }),
     )
     
-    inlines = [
-        FormacionAcademicaInline,
-        ExperienciaProfesionalInline,
-        HabilidadInline,
-        ProyectoInline
-    ]
+    inlines = [ExperienciaLaboralInline, ReconocimientoInline, CursoRealizadoInline]
     
     def foto_preview(self, obj):
         if obj.foto:
@@ -164,387 +128,263 @@ class PerfilProfesionalAdmin(admin.ModelAdmin):
     
     foto_preview_large.short_description = 'Vista previa'
     
-    def cv_publico_badge(self, obj):
-        if obj.cv_publico:
+    def perfilactivo_badge(self, obj):
+        if obj.perfilactivo:
             return format_html(
-                '<span style="background: #28a745; color: white; padding: 3px 8px; border-radius: 3px;">✓ Público</span>'
+                '<span style="background: #28a745; color: white; padding: 3px 8px; border-radius: 3px;">✓ Activo</span>'
             )
         return format_html(
-            '<span style="background: #6c757d; color: white; padding: 3px 8px; border-radius: 3px;">✗ Privado</span>'
+            '<span style="background: #dc3545; color: white; padding: 3px 8px; border-radius: 3px;">✗ Inactivo</span>'
         )
     
-    cv_publico_badge.short_description = 'Visibilidad'
-    
-    def ver_cv_publico(self, obj):
-        if obj.cv_publico:
-            url = reverse('curriculum:cv_publico', kwargs={'slug': obj.slug})
-            return format_html(
-                '<a href="{}" target="_blank" class="button">Ver CV Público →</a>',
-                url
-            )
-        return 'CV no es público'
-    
-    ver_cv_publico.short_description = 'CV Público'
+    perfilactivo_badge.short_description = 'Estado'
 
 
 # ======================================
-# FORMACIÓN ACADÉMICA ADMIN
+# ADMIN: EXPERIENCIA LABORAL
 # ======================================
 
-@admin.register(FormacionAcademica)
-class FormacionAcademicaAdmin(admin.ModelAdmin):
+@admin.register(ExperienciaLaboral)
+class ExperienciaLaboralAdmin(admin.ModelAdmin):
     list_display = [
-        'titulo_obtenido',
-        'institucion',
-        'nivel',
-        'estado',
-        'fecha_inicio',
-        'fecha_fin',
-        'perfil'
+        'cargodesempenado',
+        'nombrempresa',
+        'fechainiciogestion',
+        'fechafingestion',
+        'activar_badge',
+        'idperfilconqueestaactivo'
     ]
     
-    list_filter = ['nivel', 'estado', 'fecha_inicio']
-    search_fields = ['titulo_obtenido', 'institucion', 'perfil__nombres', 'perfil__apellidos']
+    list_filter = ['activarparaqueseveaenfront', 'fechainiciogestion']
+    search_fields = ['cargodesempenado', 'nombrempresa']
+    ordering = ['-fechainiciogestion']
     
     fieldsets = (
-        ('Información Académica', {
+        ('Información del Cargo', {
             'fields': (
-                'perfil',
-                'nivel',
-                'titulo_obtenido',
-                'institucion'
+                'idperfilconqueestaactivo',
+                'cargodesempenado',
+                'nombrempresa',
+                'lugarempresa'
             )
         }),
-        ('Fechas', {
+        ('Contacto Empresarial', {
             'fields': (
-                'fecha_inicio',
-                'fecha_fin',
-                'estado'
+                'emailempresa',
+                'sitiowebempresa',
+                'nombrecontactoempresarial',
+                'telefonocontactoempresarial'
             )
         }),
-        ('Detalles', {
+        ('Fechas y Funciones', {
             'fields': (
-                'promedio',
-                'descripcion',
-                'certificado'
+                'fechainiciogestion',
+                'fechafingestion',
+                'descripcionfunciones'
             )
         }),
-        ('Configuración', {
-            'fields': ('orden',)
-        }),
-    )
-
-
-# ======================================
-# EXPERIENCIA PROFESIONAL ADMIN
-# ======================================
-
-@admin.register(ExperienciaProfesional)
-class ExperienciaProfesionalAdmin(admin.ModelAdmin):
-    list_display = [
-        'cargo',
-        'empresa',
-        'tipo_empleo',
-        'fecha_inicio',
-        'fecha_fin',
-        'trabajo_actual_badge',
-        'perfil'
-    ]
-    
-    list_filter = ['tipo_empleo', 'trabajo_actual', 'pais', 'fecha_inicio']
-    search_fields = ['cargo', 'empresa', 'perfil__nombres', 'perfil__apellidos']
-    
-    fieldsets = (
-        ('Información Laboral', {
+        ('Certificado y Visibilidad', {
             'fields': (
-                'perfil',
-                'cargo',
-                'empresa',
-                'tipo_empleo'
+                'rutacertificado',
+                'activarparaqueseveaenfront'
             )
-        }),
-        ('Ubicación', {
-            'fields': ('ciudad', 'pais')
-        }),
-        ('Fechas', {
-            'fields': (
-                'fecha_inicio',
-                'fecha_fin',
-                'trabajo_actual'
-            )
-        }),
-        ('Descripción', {
-            'fields': (
-                'descripcion',
-                'logros',
-                'tecnologias_usadas'
-            )
-        }),
-        ('Configuración', {
-            'fields': ('orden',)
         }),
     )
     
-    def trabajo_actual_badge(self, obj):
-        if obj.trabajo_actual:
-            return format_html(
-                '<span style="background: #28a745; color: white; padding: 3px 8px; border-radius: 3px;">Actual</span>'
-            )
-        return '-'
+    def activar_badge(self, obj):
+        if obj.activarparaqueseveaenfront:
+            return format_html('<span style="color: green;">✓ Visible</span>')
+        return format_html('<span style="color: red;">✗ Oculto</span>')
     
-    trabajo_actual_badge.short_description = 'Estado'
+    activar_badge.short_description = 'Visibilidad'
 
 
 # ======================================
-# HABILIDADES ADMIN
+# ADMIN: RECONOCIMIENTOS
 # ======================================
 
-@admin.register(Habilidad)
-class HabilidadAdmin(admin.ModelAdmin):
+@admin.register(Reconocimiento)
+class ReconocimientoAdmin(admin.ModelAdmin):
     list_display = [
-        'nombre',
-        'tipo',
-        'nivel_barra',
-        'anos_experiencia',
-        'destacada_badge',
-        'perfil'
+        'tiporeconocimiento',
+        'entidadpatrocinadora',
+        'fechareconocimiento',
+        'activar_badge',
+        'idperfilconqueestaactivo'
     ]
     
-    list_filter = ['tipo', 'destacada', 'nivel']
-    search_fields = ['nombre', 'perfil__nombres', 'perfil__apellidos']
+    list_filter = ['tiporeconocimiento', 'activarparaqueseveaenfront', 'fechareconocimiento']
+    search_fields = ['entidadpatrocinadora', 'descripcionreconocimiento']
+    ordering = ['-fechareconocimiento']
     
-    fieldsets = (
-        ('Información', {
-            'fields': (
-                'perfil',
-                'nombre',
-                'tipo'
-            )
-        }),
-        ('Nivel', {
-            'fields': (
-                'nivel',
-                'anos_experiencia',
-                'descripcion'
-            )
-        }),
-        ('Certificación', {
-            'fields': ('certificado',)
-        }),
-        ('Configuración', {
-            'fields': ('orden', 'destacada')
-        }),
-    )
+    def activar_badge(self, obj):
+        if obj.activarparaqueseveaenfront:
+            return format_html('<span style="color: green;">✓ Visible</span>')
+        return format_html('<span style="color: red;">✗ Oculto</span>')
     
-    def nivel_barra(self, obj):
-        porcentaje = obj.nivel
-        color = '#28a745' if porcentaje >= 75 else '#ffc107' if porcentaje >= 50 else '#dc3545'
-        return format_html(
-            '<div style="width: 150px; background: #e9ecef; border-radius: 5px; overflow: hidden;">'
-            '<div style="width: {}%; background: {}; color: white; text-align: center; padding: 2px 0; font-size: 11px;">{} %</div>'
-            '</div>',
-            porcentaje, color, porcentaje
-        )
-    
-    nivel_barra.short_description = 'Nivel'
-    
-    def destacada_badge(self, obj):
-        if obj.destacada:
-            return format_html('<span style="color: gold; font-size: 16px;">★</span>')
-        return '-'
-    
-    destacada_badge.short_description = 'Destacada'
+    activar_badge.short_description = 'Visibilidad'
 
 
 # ======================================
-# PROYECTOS ADMIN
+# ADMIN: CURSOS REALIZADOS
 # ======================================
 
-@admin.register(Proyecto)
-class ProyectoAdmin(admin.ModelAdmin):
+@admin.register(CursoRealizado)
+class CursoRealizadoAdmin(admin.ModelAdmin):
+    list_display = [
+        'nombrecurso',
+        'entidadpatrocinadora',
+        'fechainicio',
+        'fechafin',
+        'totalhoras',
+        'activar_badge',
+        'idperfilconqueestaactivo'
+    ]
+    
+    list_filter = ['activarparaqueseveaenfront', 'fechainicio']
+    search_fields = ['nombrecurso', 'entidadpatrocinadora']
+    ordering = ['-fechainicio']
+    
+    def activar_badge(self, obj):
+        if obj.activarparaqueseveaenfront:
+            return format_html('<span style="color: green;">✓ Visible</span>')
+        return format_html('<span style="color: red;">✗ Oculto</span>')
+    
+    activar_badge.short_description = 'Visibilidad'
+
+
+# ======================================
+# ADMIN: PRODUCTOS ACADÉMICOS
+# ======================================
+
+@admin.register(ProductoAcademico)
+class ProductoAcademicoAdmin(admin.ModelAdmin):
+    list_display = [
+        'nombrerecurso',
+        'clasificador_preview',
+        'activar_badge',
+        'idperfilconqueestaactivo'
+    ]
+    
+    list_filter = ['activarparaqueseveaenfront']
+    search_fields = ['nombrerecurso', 'clasificador']
+    
+    def clasificador_preview(self, obj):
+        tags = obj.get_etiquetas()[:3]
+        return ', '.join(tags) + ('...' if len(obj.get_etiquetas()) > 3 else '')
+    
+    clasificador_preview.short_description = 'Etiquetas'
+    
+    def activar_badge(self, obj):
+        if obj.activarparaqueseveaenfront:
+            return format_html('<span style="color: green;">✓ Visible</span>')
+        return format_html('<span style="color: red;">✗ Oculto</span>')
+    
+    activar_badge.short_description = 'Visibilidad'
+
+
+# ======================================
+# ADMIN: PRODUCTOS LABORALES
+# ======================================
+
+@admin.register(ProductoLaboral)
+class ProductoLaboralAdmin(admin.ModelAdmin):
+    list_display = [
+        'nombreproducto',
+        'fechaproducto',
+        'activar_badge',
+        'idperfilconqueestaactivo'
+    ]
+    
+    list_filter = ['activarparaqueseveaenfront', 'fechaproducto']
+    search_fields = ['nombreproducto']
+    ordering = ['-fechaproducto']
+    
+    def activar_badge(self, obj):
+        if obj.activarparaqueseveaenfront:
+            return format_html('<span style="color: green;">✓ Visible</span>')
+        return format_html('<span style="color: red;">✗ Oculto</span>')
+    
+    activar_badge.short_description = 'Visibilidad'
+
+
+# ======================================
+# ADMIN: VENTA GARAGE
+# ======================================
+
+@admin.register(VentaGarage)
+class VentaGarageAdmin(admin.ModelAdmin):
     list_display = [
         'imagen_preview',
-        'nombre',
-        'estado',
-        'fecha_inicio',
-        'destacado_badge',
-        'perfil'
+        'nombreproducto',
+        'estado_badge',
+        'valordelbien',
+        'fecha_publicacion',
+        'activar_badge',
+        'idperfilconqueestaactivo'
     ]
     
-    list_filter = ['estado', 'destacado', 'fecha_inicio']
-    search_fields = ['nombre', 'descripcion_corta', 'perfil__nombres']
+    list_filter = ['estadoproducto', 'activarparaqueseveaenfront', 'fecha_publicacion']
+    search_fields = ['nombreproducto']
+    ordering = ['-fecha_publicacion']
     
     readonly_fields = ['imagen_preview_large']
     
     fieldsets = (
-        ('Información del Proyecto', {
+        ('Información del Producto', {
             'fields': (
-                'perfil',
-                'nombre',
-                'descripcion_corta',
+                'idperfilconqueestaactivo',
+                'nombreproducto',
+                'estadoproducto',
                 'descripcion',
-                'estado'
+                'valordelbien'
             )
         }),
-        ('Fechas y Rol', {
+        ('Publicación e Imagen', {
             'fields': (
-                'fecha_inicio',
-                'fecha_fin',
-                'rol',
-                'tecnologias'
-            )
-        }),
-        ('Enlaces', {
-            'fields': (
-                'url_demo',
-                'url_repositorio'
-            )
-        }),
-        ('Imagen', {
-            'fields': (
-                'imagen',
+                'fecha_publicacion',
+                'imagen_producto',
                 'imagen_preview_large'
             )
         }),
-        ('Configuración', {
-            'fields': ('orden', 'destacado')
+        ('Visibilidad', {
+            'fields': ('activarparaqueseveaenfront',)
         }),
     )
     
     def imagen_preview(self, obj):
-        if obj.imagen:
+        if obj.imagen_producto:
             return format_html(
-                '<img src="{}" width="80" height="45" style="border-radius: 5px; object-fit: cover;" />',
-                obj.imagen.url
+                '<img src="{}" width="60" height="60" style="border-radius: 5px; object-fit: cover;" />',
+                obj.imagen_producto.url
             )
-        return '-'
+        return '📦'
     
     imagen_preview.short_description = 'Imagen'
     
     def imagen_preview_large(self, obj):
-        if obj.imagen:
+        if obj.imagen_producto:
             return format_html(
-                '<img src="{}" width="400" height="225" style="border-radius: 10px; object-fit: cover;" />',
-                obj.imagen.url
+                '<img src="{}" width="300" height="300" style="border-radius: 10px; object-fit: cover;" />',
+                obj.imagen_producto.url
             )
         return 'Sin imagen'
     
     imagen_preview_large.short_description = 'Vista previa'
     
-    def destacado_badge(self, obj):
-        if obj.destacado:
-            return format_html('<span style="color: gold; font-size: 16px;">★</span>')
-        return '-'
-    
-    destacado_badge.short_description = 'Destacado'
-
-
-# ======================================
-# REFERENCIAS ADMIN
-# ======================================
-
-@admin.register(ReferenciaProfesional)
-class ReferenciaProfesionalAdmin(admin.ModelAdmin):
-    list_display = [
-        'nombre_completo',
-        'cargo',
-        'empresa',
-        'email',
-        'mostrar_contacto_badge',
-        'perfil'
-    ]
-    
-    search_fields = ['nombre_completo', 'cargo', 'empresa', 'perfil__nombres']
-    list_filter = ['mostrar_contacto']
-    
-    fieldsets = (
-        ('Información de la Referencia', {
-            'fields': (
-                'perfil',
-                'nombre_completo',
-                'cargo',
-                'empresa',
-                'relacion'
-            )
-        }),
-        ('Contacto', {
-            'fields': (
-                'email',
-                'telefono',
-                'linkedin'
-            )
-        }),
-        ('Testimonio', {
-            'fields': ('testimonio',)
-        }),
-        ('Configuración', {
-            'fields': ('orden', 'mostrar_contacto')
-        }),
-    )
-    
-    def mostrar_contacto_badge(self, obj):
-        if obj.mostrar_contacto:
-            return format_html('<span style="color: green;">✓</span>')
-        return format_html('<span style="color: red;">✗</span>')
-    
-    mostrar_contacto_badge.short_description = 'Mostrar contacto'
-
-
-# ======================================
-# CERTIFICACIONES ADMIN
-# ======================================
-
-@admin.register(Certificacion)
-class CertificacionAdmin(admin.ModelAdmin):
-    list_display = [
-        'nombre',
-        'institucion',
-        'fecha_obtencion',
-        'vigencia_badge',
-        'perfil'
-    ]
-    
-    list_filter = ['fecha_obtencion', 'institucion']
-    search_fields = ['nombre', 'institucion', 'perfil__nombres']
-    
-    fieldsets = (
-        ('Información de la Certificación', {
-            'fields': (
-                'perfil',
-                'nombre',
-                'institucion'
-            )
-        }),
-        ('Fechas', {
-            'fields': (
-                'fecha_obtencion',
-                'fecha_expiracion'
-            )
-        }),
-        ('Credenciales', {
-            'fields': (
-                'codigo_credencial',
-                'url_verificacion'
-            )
-        }),
-        ('Detalles', {
-            'fields': (
-                'descripcion',
-                'certificado'
-            )
-        }),
-        ('Configuración', {
-            'fields': ('orden',)
-        }),
-    )
-    
-    def vigencia_badge(self, obj):
-        if obj.esta_vigente:
-            return format_html(
-                '<span style="background: #28a745; color: white; padding: 3px 8px; border-radius: 3px;">Vigente</span>'
-            )
+    def estado_badge(self, obj):
+        color = obj.get_color_estado()
         return format_html(
-            '<span style="background: #dc3545; color: white; padding: 3px 8px; border-radius: 3px;">Expirado</span>'
+            '<span style="background: {}; color: white; padding: 3px 10px; border-radius: 3px;">{}</span>',
+            color,
+            obj.estadoproducto
         )
     
-    vigencia_badge.short_description = 'Estado'
+    estado_badge.short_description = 'Estado'
+    
+    def activar_badge(self, obj):
+        if obj.activarparaqueseveaenfront:
+            return format_html('<span style="color: green;">✓ Visible</span>')
+        return format_html('<span style="color: red;">✗ Oculto</span>')
+    
+    activar_badge.short_description = 'Visibilidad'
