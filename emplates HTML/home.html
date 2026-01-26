@@ -1,129 +1,290 @@
-{% extends 'curriculum/base.html' %}
+{% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Inicio - CV Profesional{% endblock %}
+{% block title %}Mi Perfil Profesional Online{% endblock %}
 
-{% block main_class %}{% endblock %}
+{% block extra_css %}
+<style>
+    /* Hero Section Mejorado */
+    .hero-section {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #2E7D32 0%, #1B5E20 100%);
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+    }
+    
+    /* Burbujas Flotantes con Etiquetas de Habilidades */
+    .floating-bubbles {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        overflow: hidden;
+        pointer-events: none;
+    }
+    
+    .bubble {
+        position: absolute;
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        animation: float 20s infinite ease-in-out;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        font-size: 14px;
+        padding: 10px;
+        text-align: center;
+    }
+    
+    .bubble:nth-child(1) { width: 120px; height: 120px; left: 10%; animation-delay: 0s; }
+    .bubble:nth-child(2) { width: 100px; height: 100px; left: 25%; animation-delay: 2s; }
+    .bubble:nth-child(3) { width: 140px; height: 140px; left: 50%; animation-delay: 4s; }
+    .bubble:nth-child(4) { width: 90px; height: 90px; left: 70%; animation-delay: 1s; }
+    .bubble:nth-child(5) { width: 110px; height: 110px; left: 85%; animation-delay: 3s; }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0) rotate(0deg); }
+        25% { transform: translateY(-30px) rotate(5deg); }
+        50% { transform: translateY(-60px) rotate(-5deg); }
+        75% { transform: translateY(-30px) rotate(3deg); }
+    }
+    
+    .hero-content {
+        position: relative;
+        z-index: 2;
+    }
+    
+    /* Navegación Flotante Fija */
+    .nav-flotante {
+        position: fixed;
+        right: 30px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: white;
+        border-radius: 30px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        padding: 15px 10px;
+        z-index: 1000;
+        transition: all 0.3s ease;
+    }
+    
+    .nav-flotante a {
+        display: block;
+        width: 50px;
+        height: 50px;
+        margin: 10px 0;
+        border-radius: 50%;
+        background: #f8f9fa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        color: #2E7D32;
+        font-size: 20px;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+    
+    .nav-flotante a:hover {
+        background: #2E7D32;
+        color: white;
+        transform: scale(1.1);
+    }
+    
+    .nav-flotante a span {
+        position: absolute;
+        right: 70px;
+        background: #2E7D32;
+        color: white;
+        padding: 8px 15px;
+        border-radius: 20px;
+        white-space: nowrap;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+        font-size: 14px;
+    }
+    
+    .nav-flotante a:hover span {
+        opacity: 1;
+    }
+    
+    /* Secciones */
+    .section-content {
+        min-height: 80vh;
+        padding: 80px 0;
+    }
+    
+    .section-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #2E7D32;
+        margin-bottom: 30px;
+        position: relative;
+        display: inline-block;
+    }
+    
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 0;
+        width: 60px;
+        height: 4px;
+        background: #2E7D32;
+    }
+    
+    /* Cards Modernos */
+    .feature-card {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        height: 100%;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        border-color: #2E7D32;
+    }
+    
+    .feature-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #2E7D32, #4CAF50);
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 35px;
+        color: white;
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 
 <!-- Hero Section -->
-<section class="bg-gradient text-white py-5" style="background: linear-gradient(135deg, #2E7D32 0%, #1B5E20 100%);">
-    <div class="container py-5">
+<section id="inicio" class="hero-section">
+    <!-- Burbujas Flotantes con Habilidades -->
+    <div class="floating-bubbles">
+        <div class="bubble">Python<br>2020</div>
+        <div class="bubble">Django<br>2021</div>
+        <div class="bubble">JavaScript<br>2019</div>
+        <div class="bubble">React<br>2022</div>
+        <div class="bubble">PostgreSQL<br>2020</div>
+    </div>
+    
+    <div class="container hero-content">
         <div class="row align-items-center">
-            <div class="col-lg-6 mb-4 mb-lg-0">
-                <h1 class="display-4 fw-bold mb-3">
-                    Crea tu CV Profesional
+            <div class="col-lg-7 text-white">
+                <h1 class="display-3 fw-bold mb-4 animate__animated animate__fadeInLeft">
+                    Mi Perfil Profesional Online
                 </h1>
-                <p class="lead mb-4">
-                    Sistema moderno para crear, gestionar y descargar tu currículum vitae de forma profesional. 
-                    Completamente automatizado y fácil de usar.
+                <p class="lead mb-4 animate__animated animate__fadeInLeft animate__delay-1s">
+                    Crea, gestiona y comparte tu currículum vitae de forma profesional. 
+                    Sistema moderno, automatizado y fácil de usar.
                 </p>
-                <div class="d-flex gap-3">
+                <div class="d-flex gap-3 animate__animated animate__fadeInUp animate__delay-2s">
                     {% if user.is_authenticated %}
-                        <a href="{% url 'curriculum:dashboard' %}" class="btn btn-light btn-lg">
+                        <a href="{% url 'dashboard' %}" class="btn btn-light btn-lg px-5">
                             <i class="bi bi-speedometer2 me-2"></i> Ir al Dashboard
                         </a>
                     {% else %}
-                        <a href="{% url 'curriculum:registro' %}" class="btn btn-light btn-lg">
-                            <i class="bi bi-person-plus me-2"></i> Comenzar Gratis
+                        <a href="{% url 'registro' %}" class="btn btn-light btn-lg px-5">
+                            <i class="bi bi-rocket-takeoff me-2"></i> Comenzar Ahora
                         </a>
-                        <a href="{% url 'curriculum:login' %}" class="btn btn-outline-light btn-lg">
+                        <a href="{% url 'login' %}" class="btn btn-outline-light btn-lg px-5">
                             <i class="bi bi-box-arrow-in-right me-2"></i> Iniciar Sesión
                         </a>
                     {% endif %}
                 </div>
             </div>
-            <div class="col-lg-6 text-center">
-                <i class="bi bi-file-earmark-person display-1" style="font-size: 12rem; opacity: 0.2;"></i>
+            <div class="col-lg-5 text-center animate__animated animate__fadeInRight animate__delay-1s">
+                <i class="bi bi-file-earmark-person display-1" style="font-size: 15rem; opacity: 0.2;"></i>
             </div>
         </div>
     </div>
 </section>
 
+<!-- Navegación Flotante -->
+<nav class="nav-flotante">
+    <a href="#inicio">
+        <i class="bi bi-house-fill"></i>
+        <span>Inicio</span>
+    </a>
+    <a href="#caracteristicas">
+        <i class="bi bi-star-fill"></i>
+        <span>Características</span>
+    </a>
+    <a href="#secciones">
+        <i class="bi bi-folder-fill"></i>
+        <span>Secciones</span>
+    </a>
+    <a href="#como-funciona">
+        <i class="bi bi-lightbulb-fill"></i>
+        <span>Cómo Funciona</span>
+    </a>
+    <a href="#contacto">
+        <i class="bi bi-envelope-fill"></i>
+        <span>Contacto</span>
+    </a>
+</nav>
+
 <!-- Características -->
-<section class="py-5 bg-white">
+<section id="caracteristicas" class="section-content bg-light">
     <div class="container">
         <div class="text-center mb-5">
-            <h2 class="fw-bold">Características Principales</h2>
-            <p class="text-muted">Todo lo que necesitas para crear un CV profesional</p>
+            <h2 class="section-title">Características Principales</h2>
+            <p class="lead text-muted">Todo lo que necesitas para crear un CV profesional</p>
         </div>
         
         <div class="row g-4">
             <div class="col-md-4">
-                <div class="card border-0 shadow-sm h-100 text-center p-4">
-                    <div class="mb-3">
-                        <i class="bi bi-lightning-fill text-primary" style="font-size: 3rem;"></i>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-lightning-charge-fill"></i>
                     </div>
-                    <h5 class="fw-bold">Completamente Automatizado</h5>
-                    <p class="text-muted mb-0">
-                        El sistema procesa imágenes, calcula experiencia y genera PDFs automáticamente. 
-                        Solo debes llenar los formularios.
+                    <h4 class="fw-bold mb-3">100% Automatizado</h4>
+                    <p class="text-muted">
+                        El sistema procesa todo automáticamente: imágenes, fechas, cálculos.
+                        Solo completa los formularios.
                     </p>
                 </div>
             </div>
             
             <div class="col-md-4">
-                <div class="card border-0 shadow-sm h-100 text-center p-4">
-                    <div class="mb-3">
-                        <i class="bi bi-file-pdf-fill text-danger" style="font-size: 3rem;"></i>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-file-pdf-fill"></i>
                     </div>
-                    <h5 class="fw-bold">Generación de PDF</h5>
-                    <p class="text-muted mb-0">
-                        Descarga tu CV en formato PDF profesional con un solo clic. 
-                        Listo para enviar a empleadores.
+                    <h4 class="fw-bold mb-3">Generación de PDF</h4>
+                    <p class="text-muted">
+                        Descarga tu CV en formato PDF profesional. 
+                        Elige qué secciones incluir.
                     </p>
                 </div>
             </div>
             
             <div class="col-md-4">
-                <div class="card border-0 shadow-sm h-100 text-center p-4">
-                    <div class="mb-3">
-                        <i class="bi bi-phone-fill text-success" style="font-size: 3rem;"></i>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-shield-check-fill"></i>
                     </div>
-                    <h5 class="fw-bold">Diseño Responsive</h5>
-                    <p class="text-muted mb-0">
-                        Accede desde cualquier dispositivo. Tu CV se adapta perfectamente 
-                        a móviles, tablets y computadoras.
-                    </p>
-                </div>
-            </div>
-            
-            <div class="col-md-4">
-                <div class="card border-0 shadow-sm h-100 text-center p-4">
-                    <div class="mb-3">
-                        <i class="bi bi-shield-check-fill text-info" style="font-size: 3rem;"></i>
-                    </div>
-                    <h5 class="fw-bold">Seguro y Privado</h5>
-                    <p class="text-muted mb-0">
-                        Tus datos están protegidos. Decide si tu CV es público o privado. 
-                        Control total sobre tu información.
-                    </p>
-                </div>
-            </div>
-            
-            <div class="col-md-4">
-                <div class="card border-0 shadow-sm h-100 text-center p-4">
-                    <div class="mb-3">
-                        <i class="bi bi-graph-up-arrow text-warning" style="font-size: 3rem;"></i>
-                    </div>
-                    <h5 class="fw-bold">Seguimiento de Progreso</h5>
-                    <p class="text-muted mb-0">
-                        Dashboard con estadísticas y porcentaje de completitud. 
-                        Visualiza tu progreso en tiempo real.
-                    </p>
-                </div>
-            </div>
-            
-            <div class="col-md-4">
-                <div class="card border-0 shadow-sm h-100 text-center p-4">
-                    <div class="mb-3">
-                        <i class="bi bi-images text-primary" style="font-size: 3rem;"></i>
-                    </div>
-                    <h5 class="fw-bold">Portafolio Visual</h5>
-                    <p class="text-muted mb-0">
-                        Agrega imágenes de tus proyectos, certificados y más. 
-                        Procesamiento automático de imágenes.
+                    <h4 class="fw-bold mb-3">Seguro y Privado</h4>
+                    <p class="text-muted">
+                        Control total sobre tu información. 
+                        Decide qué mostrar y qué ocultar.
                     </p>
                 </div>
             </div>
@@ -132,128 +293,170 @@
 </section>
 
 <!-- Secciones del CV -->
-<section class="py-5 bg-light">
+<section id="secciones" class="section-content">
     <div class="container">
         <div class="text-center mb-5">
-            <h2 class="fw-bold">Secciones de tu CV</h2>
-            <p class="text-muted">Crea un currículum completo y profesional</p>
+            <h2 class="section-title">Secciones de tu CV</h2>
+            <p class="lead text-muted">Información completa y profesional</p>
         </div>
         
         <div class="row g-4">
-            <div class="col-md-6 col-lg-3">
-                <div class="text-center">
-                    <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                        <i class="bi bi-person-badge fs-2"></i>
-                    </div>
-                    <h6 class="fw-bold">Perfil Profesional</h6>
-                    <p class="text-muted small">Datos personales, foto, contacto y resumen profesional</p>
+            <div class="col-md-4">
+                <div class="feature-card text-center">
+                    <i class="bi bi-person-badge-fill text-primary" style="font-size: 4rem;"></i>
+                    <h5 class="fw-bold mt-3">Datos Personales</h5>
+                    <p class="text-muted small">Información básica, contacto, foto de perfil</p>
                 </div>
             </div>
             
-            <div class="col-md-6 col-lg-3">
-                <div class="text-center">
-                    <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                        <i class="bi bi-mortarboard fs-2"></i>
-                    </div>
-                    <h6 class="fw-bold">Formación Académica</h6>
-                    <p class="text-muted small">Títulos, instituciones, promedios y certificados</p>
+            <div class="col-md-4">
+                <div class="feature-card text-center">
+                    <i class="bi bi-briefcase-fill text-success" style="font-size: 4rem;"></i>
+                    <h5 class="fw-bold mt-3">Experiencia Laboral</h5>
+                    <p class="text-muted small">Historial laboral con fechas validadas</p>
                 </div>
             </div>
             
-            <div class="col-md-6 col-lg-3">
-                <div class="text-center">
-                    <div class="bg-info text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                        <i class="bi bi-briefcase fs-2"></i>
-                    </div>
-                    <h6 class="fw-bold">Experiencia Laboral</h6>
-                    <p class="text-muted small">Trabajos, cargos, logros y tecnologías usadas</p>
+            <div class="col-md-4">
+                <div class="feature-card text-center">
+                    <i class="bi bi-award-fill text-warning" style="font-size: 4rem;"></i>
+                    <h5 class="fw-bold mt-3">Reconocimientos</h5>
+                    <p class="text-muted small">Logros académicos y profesionales</p>
                 </div>
             </div>
             
-            <div class="col-md-6 col-lg-3">
-                <div class="text-center">
-                    <div class="bg-warning text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                        <i class="bi bi-star fs-2"></i>
-                    </div>
-                    <h6 class="fw-bold">Habilidades</h6>
-                    <p class="text-muted small">Habilidades técnicas, blandas, idiomas y niveles</p>
+            <div class="col-md-4">
+                <div class="feature-card text-center">
+                    <i class="bi bi-book-fill text-info" style="font-size: 4rem;"></i>
+                    <h5 class="fw-bold mt-3">Cursos Realizados</h5>
+                    <p class="text-muted small">Capacitaciones y certificaciones</p>
                 </div>
             </div>
             
-            <div class="col-md-6 col-lg-3">
-                <div class="text-center">
-                    <div class="bg-danger text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                        <i class="bi bi-folder fs-2"></i>
-                    </div>
-                    <h6 class="fw-bold">Proyectos</h6>
-                    <p class="text-muted small">Portafolio de proyectos con imágenes y enlaces</p>
+            <div class="col-md-4">
+                <div class="feature-card text-center">
+                    <i class="bi bi-lightbulb-fill text-danger" style="font-size: 4rem;"></i>
+                    <h5 class="fw-bold mt-3">Productos Académicos</h5>
+                    <p class="text-muted small">Publicaciones y proyectos académicos</p>
                 </div>
             </div>
             
-            <div class="col-md-6 col-lg-3">
-                <div class="text-center">
-                    <div class="bg-secondary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                        <i class="bi bi-award fs-2"></i>
-                    </div>
-                    <h6 class="fw-bold">Certificaciones</h6>
-                    <p class="text-muted small">Cursos, certificados y credenciales verificables</p>
-                </div>
-            </div>
-            
-            <div class="col-md-6 col-lg-3">
-                <div class="text-center">
-                    <div class="bg-dark text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                        <i class="bi bi-people fs-2"></i>
-                    </div>
-                    <h6 class="fw-bold">Referencias</h6>
-                    <p class="text-muted small">Referencias profesionales con testimonios</p>
-                </div>
-            </div>
-            
-            <div class="col-md-6 col-lg-3">
-                <div class="text-center">
-                    <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                        <i class="bi bi-graph-up fs-2"></i>
-                    </div>
-                    <h6 class="fw-bold">Estadísticas</h6>
-                    <p class="text-muted small">Dashboard con métricas y progreso del CV</p>
+            <div class="col-md-4">
+                <div class="feature-card text-center">
+                    <i class="bi bi-cart-fill text-secondary" style="font-size: 4rem;"></i>
+                    <h5 class="fw-bold mt-3">Venta Garage</h5>
+                    <p class="text-muted small">Productos en venta con imágenes</p>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Estadísticas -->
-<section class="py-5 bg-white">
+<!-- Cómo Funciona -->
+<section id="como-funciona" class="section-content bg-light">
     <div class="container">
-        <div class="row text-center g-4">
-            <div class="col-md-4">
-                <h2 class="display-4 fw-bold text-primary">{{ total_usuarios }}</h2>
-                <p class="text-muted">Usuarios Registrados</p>
+        <div class="text-center mb-5">
+            <h2 class="section-title">Cómo Funciona</h2>
+            <p class="lead text-muted">Sigue estos simples pasos</p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-3 text-center">
+                <div class="feature-icon mx-auto">
+                    <span class="fw-bold" style="font-size: 35px;">1</span>
+                </div>
+                <h5 class="fw-bold mt-3">Regístrate</h5>
+                <p class="text-muted">Crea tu cuenta en segundos</p>
             </div>
-            <div class="col-md-4">
-                <h2 class="display-4 fw-bold text-success">{{ cvs_publicos }}</h2>
-                <p class="text-muted">CVs Públicos</p>
+            
+            <div class="col-md-3 text-center">
+                <div class="feature-icon mx-auto">
+                    <span class="fw-bold" style="font-size: 35px;">2</span>
+                </div>
+                <h5 class="fw-bold mt-3">Completa tu Perfil</h5>
+                <p class="text-muted">Llena los formularios con tu información</p>
             </div>
-            <div class="col-md-4">
-                <h2 class="display-4 fw-bold text-info">100%</h2>
-                <p class="text-muted">Gratis</p>
+            
+            <div class="col-md-3 text-center">
+                <div class="feature-icon mx-auto">
+                    <span class="fw-bold" style="font-size: 35px;">3</span>
+                </div>
+                <h5 class="fw-bold mt-3">Personaliza</h5>
+                <p class="text-muted">Elige qué secciones mostrar</p>
+            </div>
+            
+            <div class="col-md-3 text-center">
+                <div class="feature-icon mx-auto">
+                    <span class="fw-bold" style="font-size: 35px;">4</span>
+                </div>
+                <h5 class="fw-bold mt-3">Descarga</h5>
+                <p class="text-muted">Genera tu PDF profesional</p>
             </div>
         </div>
     </div>
 </section>
 
-<!-- CTA Final -->
-{% if not user.is_authenticated %}
-<section class="py-5 bg-gradient text-white" style="background: linear-gradient(135deg, #1976D2 0%, #0D47A1 100%);">
-    <div class="container text-center">
-        <h2 class="fw-bold mb-3">¿Listo para crear tu CV profesional?</h2>
-        <p class="lead mb-4">Regístrate ahora y comienza a construir tu futuro</p>
-        <a href="{% url 'curriculum:registro' %}" class="btn btn-light btn-lg">
-            <i class="bi bi-rocket-takeoff me-2"></i> Comenzar Ahora
-        </a>
+<!-- Contacto -->
+<section id="contacto" class="section-content">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 text-center">
+                <h2 class="section-title mx-auto">¿Listo para Comenzar?</h2>
+                <p class="lead text-muted mb-4">
+                    Únete a miles de profesionales que ya usan nuestro sistema
+                </p>
+                {% if not user.is_authenticated %}
+                <a href="{% url 'registro' %}" class="btn btn-primary btn-lg px-5">
+                    <i class="bi bi-rocket-takeoff me-2"></i> Crear mi CV Ahora
+                </a>
+                {% endif %}
+            </div>
+        </div>
     </div>
 </section>
-{% endif %}
 
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Smooth scroll para navegación flotante
+    document.querySelectorAll('.nav-flotante a').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+    
+    // Resaltar sección activa en navegación
+    window.addEventListener('scroll', function() {
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('.nav-flotante a');
+        
+        let current = '';
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            const sectionHeight = section.clientHeight;
+            if (scrollY >= (sectionTop - 200)) {
+                current = section.getAttribute('id');
+            }
+        });
+        
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href').substring(1) === current) {
+                link.style.background = '#2E7D32';
+                link.style.color = 'white';
+            } else {
+                link.style.background = '#f8f9fa';
+                link.style.color = '#2E7D32';
+            }
+        });
+    });
+</script>
 {% endblock %}
