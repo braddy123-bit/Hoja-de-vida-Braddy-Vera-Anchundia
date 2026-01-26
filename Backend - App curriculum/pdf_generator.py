@@ -1,6 +1,4 @@
-"""
-Generador de PDF para CV Profesional
-"""
+
 
 from io import BytesIO
 from reportlab.lib.pagesizes import A4
@@ -8,25 +6,41 @@ from reportlab.lib.units import cm
 from reportlab.lib import colors
 from reportlab.platypus import (
     SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle,
-    PageBreak, Image, KeepTogether
+    PageBreak, KeepTogether
 )
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT, TA_JUSTIFY
-from reportlab.pdfgen import canvas
+from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_JUSTIFY
 from datetime import date
 
 
-def generar_cv_pdf(perfil):
+def generar_cv_pdf_profesional(perfil, secciones_seleccionadas=None):
     """
-    Genera un PDF profesional del CV
+    Genera PDF con secciones seleccionables
     
     Args:
-        perfil: Instancia de PerfilProfesional
-    
-    Returns:
-        BytesIO: Buffer con el PDF generado
+        perfil: Instancia de DatosPersonales
+        secciones_seleccionadas: Dict con las secciones a incluir
+            {
+                'experiencia': True/False,
+                'reconocimientos': True/False,
+                'cursos': True/False,
+                'productos_academicos': True/False,
+                'productos_laborales': True/False,
+                'venta_garage': True/False
+            }
     """
     buffer = BytesIO()
+    
+    # Si no se especifican secciones, usar configuración del perfil
+    if secciones_seleccionadas is None:
+        secciones_seleccionadas = {
+            'experiencia': perfil.mostrar_experiencia_pdf,
+            'reconocimientos': perfil.mostrar_reconocimientos_pdf,
+            'cursos': perfil.mostrar_cursos_pdf,
+            'productos_academicos': perfil.mostrar_productos_academicos_pdf,
+            'productos_laborales': perfil.mostrar_productos_laborales_pdf,
+            'venta_garage': perfil.mostrar_venta_garage_pdf,
+        }
     
     # Configuración del documento
     doc = SimpleDocTemplate(
@@ -35,13 +49,11 @@ def generar_cv_pdf(perfil):
         rightMargin=2*cm,
         leftMargin=2*cm,
         topMargin=2*cm,
-        bottomMargin=2*cm
+        bottomMargin=2*cm,
+        title=f"CV_{perfil.nombre_completo}"
     )
     
-    # Contenedor de elementos
     elements = []
-    
-    # Estilos
     styles = getSampleStyleSheet()
     
     # Estilos personalizados
@@ -50,7 +62,7 @@ def generar_cv_pdf(perfil):
         parent=styles['Heading1'],
         fontSize=24,
         textColor=colors.HexColor('#2E7D32'),
-        spaceAfter=12,
+        spaceAfter=6,
         alignment=TA_CENTER,
         fontName='Helvetica-Bold'
     )
@@ -58,9 +70,9 @@ def generar_cv_pdf(perfil):
     subtitulo_style = ParagraphStyle(
         'CustomSubtitle',
         parent=styles['Normal'],
-        fontSize=12,
+        fontSize=11,
         textColor=colors.HexColor('#666666'),
-        spaceAfter=20,
+        spaceAfter=15,
         alignment=TA_CENTER
     )
     
@@ -71,11 +83,7 @@ def generar_cv_pdf(perfil):
         textColor=colors.HexColor('#2E7D32'),
         spaceAfter=10,
         spaceBefore=15,
-        fontName='Helvetica-Bold',
-        borderWidth=0,
-        borderPadding=5,
-        borderColor=colors.HexColor('#2E7D32'),
-        borderRadius=0
+        fontName='Helvetica-Bold'
     )
     
     texto_normal = ParagraphStyle(
@@ -96,30 +104,33 @@ def generar_cv_pdf(perfil):
     # ENCABEZADO
     # ======================================
     
-    # Nombre completo
     nombre = Paragraph(perfil.nombre_completo.upper(), titulo_style)
     elements.append(nombre)
     
-    # Título profesional
-    titulo = Paragraph(perfil.titulo_profesional, subtitulo_style)
-    elements.append(titulo)
+    # Información básica
+    info_basica = f"{perfil.descripcionperfil}"
+    elements.append(Paragraph(info_basica, subtitulo_style))
     
-    # Información de contacto
+    # Datos de contacto
     contacto_data = [
         [
-            Paragraph(f"<b>Email:</b> {perfil.email}", texto_normal),
-            Paragraph(f"<b>Teléfono:</b> {perfil.telefono}", texto_normal),
+            Paragraph(f"<b>Cédula:</b> {perfil.numerocedula}", texto_normal),
+            Paragraph(f"<b>Edad:</b> {perfil.edad} años", texto_normal),
         ],
         [
-            Paragraph(f"<b>Ubicación:</b> {perfil.ciudad}, {perfil.pais}", texto_normal),
-            Paragraph(f"<b>Experiencia:</b> {perfil.anos_experiencia} años", texto_normal),
+            Paragraph(f"<b>Teléfono:</b> {perfil.telefonoconvencional or perfil.telefonofijo}", texto_normal),
+            Paragraph(f"<b>Estado Civil:</b> {perfil.estadocivil}", texto_normal),
+        ],
+        [
+            Paragraph(f"<b>Dirección:</b> {perfil.direcciondomiciliaria}", texto_normal),
+            Paragraph(f"<b>Nacionalidad:</b> {perfil.nacionalidad}", texto_normal),
         ]
     ]
     
-    if perfil.linkedin:
+    if perfil.sitioweb:
         contacto_data.append([
-            Paragraph(f"<b>LinkedIn:</b> {perfil.linkedin}", texto_normal),
-            Paragraph(f"<b>GitHub:</b> {perfil.github if perfil.github else 'N/A'}", texto_normal),
+            Paragraph(f"<b>Sitio Web:</b> {perfil.sitioweb}", texto_normal),
+            Paragraph(f"<b>Licencia:</b> {perfil.get_licenciaconducir_display()}", texto_normal),
         ])
     
     contacto_table = Table(contacto_data, colWidths=[8*cm, 8*cm])
@@ -130,7 +141,7 @@ def generar_cv_pdf(perfil):
     ]))
     
     elements.append(contacto_table)
-    elements.append(Spacer(1, 0.5*cm))
+    elements.append(Spacer(1, 0.3*cm))
     
     # Línea separadora
     linea = Table([['']], colWidths=[16*cm])
@@ -138,216 +149,208 @@ def generar_cv_pdf(perfil):
         ('LINEABOVE', (0, 0), (-1, 0), 2, colors.HexColor('#2E7D32')),
     ]))
     elements.append(linea)
+    elements.append(Spacer(1, 0.3*cm))
     
     # ======================================
-    # RESUMEN PROFESIONAL
+    # EXPERIENCIA LABORAL
     # ======================================
     
-    if perfil.resumen_profesional:
-        elements.append(Spacer(1, 0.3*cm))
-        elements.append(Paragraph("RESUMEN PROFESIONAL", seccion_style))
-        elements.append(Paragraph(perfil.resumen_profesional, texto_normal))
-        elements.append(Spacer(1, 0.3*cm))
-    
-    # ======================================
-    # EXPERIENCIA PROFESIONAL
-    # ======================================
-    
-    experiencias = perfil.experiencias.all()[:10]
-    if experiencias.exists():
-        elements.append(Paragraph("EXPERIENCIA PROFESIONAL", seccion_style))
+    if secciones_seleccionadas.get('experiencia', False):
+        experiencias = perfil.experiencias_laborales.filter(activarparaqueseveaenfront=True).order_by('-fechainiciogestion')
         
-        for exp in experiencias:
-            exp_elementos = []
+        if experiencias.exists():
+            elements.append(Paragraph("EXPERIENCIA LABORAL", seccion_style))
             
-            # Cargo y empresa
-            cargo_empresa = Paragraph(
-                f"<b>{exp.cargo}</b> - {exp.empresa}",
-                texto_bold
-            )
-            exp_elementos.append(cargo_empresa)
-            
-            # Fechas y ubicación
-            fecha_inicio = exp.fecha_inicio.strftime("%m/%Y")
-            fecha_fin = "Presente" if exp.trabajo_actual else exp.fecha_fin.strftime("%m/%Y")
-            
-            fechas = Paragraph(
-                f"{fecha_inicio} - {fecha_fin} | {exp.ciudad}, {exp.pais}",
-                ParagraphStyle('dates', parent=texto_normal, fontSize=9, textColor=colors.grey)
-            )
-            exp_elementos.append(fechas)
-            
-            # Descripción
-            if exp.descripcion:
-                desc = Paragraph(exp.descripcion, texto_normal)
-                exp_elementos.append(desc)
-            
-            # Logros
-            if exp.logros:
-                logros = Paragraph(f"<b>Logros:</b> {exp.logros}", texto_normal)
-                exp_elementos.append(logros)
-            
-            # Tecnologías
-            if exp.tecnologias_usadas:
-                techs = Paragraph(
-                    f"<i>Tecnologías: {exp.tecnologias_usadas}</i>",
-                    ParagraphStyle('tech', parent=texto_normal, fontSize=9)
-                )
-                exp_elementos.append(techs)
-            
-            exp_elementos.append(Spacer(1, 0.3*cm))
-            
-            # Agrupar para mantener junto
-            elements.append(KeepTogether(exp_elementos))
-    
-    # ======================================
-    # FORMACIÓN ACADÉMICA
-    # ======================================
-    
-    formacion = perfil.formacion_academica.all()[:5]
-    if formacion.exists():
-        elements.append(Spacer(1, 0.3*cm))
-        elements.append(Paragraph("FORMACIÓN ACADÉMICA", seccion_style))
-        
-        for edu in formacion:
-            edu_elementos = []
-            
-            # Título e institución
-            titulo_edu = Paragraph(
-                f"<b>{edu.titulo_obtenido}</b> - {edu.institucion}",
-                texto_bold
-            )
-            edu_elementos.append(titulo_edu)
-            
-            # Fechas y estado
-            fecha_inicio = edu.fecha_inicio.strftime("%m/%Y")
-            fecha_fin = edu.fecha_fin.strftime("%m/%Y") if edu.fecha_fin else "En curso"
-            
-            fechas_edu = Paragraph(
-                f"{fecha_inicio} - {fecha_fin} | {edu.get_estado_display()}",
-                ParagraphStyle('dates', parent=texto_normal, fontSize=9, textColor=colors.grey)
-            )
-            edu_elementos.append(fechas_edu)
-            
-            # Promedio
-            if edu.promedio:
-                promedio = Paragraph(f"Promedio: {edu.promedio}/10", texto_normal)
-                edu_elementos.append(promedio)
-            
-            # Descripción
-            if edu.descripcion:
-                desc_edu = Paragraph(edu.descripcion, texto_normal)
-                edu_elementos.append(desc_edu)
-            
-            edu_elementos.append(Spacer(1, 0.3*cm))
-            
-            elements.append(KeepTogether(edu_elementos))
-    
-    # ======================================
-    # HABILIDADES
-    # ======================================
-    
-    habilidades = perfil.habilidades.all()[:15]
-    if habilidades.exists():
-        elements.append(Spacer(1, 0.3*cm))
-        elements.append(Paragraph("HABILIDADES", seccion_style))
-        
-        # Agrupar por tipo
-        habilidades_tecnicas = habilidades.filter(tipo='tecnica')
-        habilidades_blandas = habilidades.filter(tipo='blanda')
-        idiomas = habilidades.filter(tipo='idioma')
-        
-        if habilidades_tecnicas.exists():
-            elements.append(Paragraph("<b>Habilidades Técnicas:</b>", texto_bold))
-            skills_tech = ", ".join([f"{h.nombre} ({h.nivel}%)" for h in habilidades_tecnicas])
-            elements.append(Paragraph(skills_tech, texto_normal))
-            elements.append(Spacer(1, 0.2*cm))
-        
-        if habilidades_blandas.exists():
-            elements.append(Paragraph("<b>Habilidades Blandas:</b>", texto_bold))
-            skills_soft = ", ".join([h.nombre for h in habilidades_blandas])
-            elements.append(Paragraph(skills_soft, texto_normal))
-            elements.append(Spacer(1, 0.2*cm))
-        
-        if idiomas.exists():
-            elements.append(Paragraph("<b>Idiomas:</b>", texto_bold))
-            langs = ", ".join([f"{h.nombre} ({h.nivel}%)" for h in idiomas])
-            elements.append(Paragraph(langs, texto_normal))
-    
-    # ======================================
-    # PROYECTOS DESTACADOS
-    # ======================================
-    
-    proyectos = perfil.proyectos.filter(destacado=True)[:4]
-    if proyectos.exists():
-        elements.append(Spacer(1, 0.3*cm))
-        elements.append(Paragraph("PROYECTOS DESTACADOS", seccion_style))
-        
-        for proy in proyectos:
-            proy_elementos = []
-            
-            # Nombre del proyecto
-            nombre_proy = Paragraph(f"<b>{proy.nombre}</b>", texto_bold)
-            proy_elementos.append(nombre_proy)
-            
-            # Descripción
-            desc_proy = Paragraph(proy.descripcion_corta, texto_normal)
-            proy_elementos.append(desc_proy)
-            
-            # Tecnologías
-            if proy.tecnologias:
-                tech_proy = Paragraph(f"<i>Tecnologías: {proy.tecnologias}</i>", texto_normal)
-                proy_elementos.append(tech_proy)
-            
-            # Enlaces
-            if proy.url_demo or proy.url_repositorio:
-                links = []
-                if proy.url_demo:
-                    links.append(f"Demo: {proy.url_demo}")
-                if proy.url_repositorio:
-                    links.append(f"Repo: {proy.url_repositorio}")
+            for exp in experiencias:
+                exp_elementos = []
                 
-                enlaces = Paragraph(" | ".join(links), ParagraphStyle('links', parent=texto_normal, fontSize=8))
-                proy_elementos.append(enlaces)
-            
-            proy_elementos.append(Spacer(1, 0.3*cm))
-            
-            elements.append(KeepTogether(proy_elementos))
+                cargo_empresa = Paragraph(
+                    f"<b>{exp.cargodesempenado}</b> - {exp.nombrempresa}",
+                    texto_bold
+                )
+                exp_elementos.append(cargo_empresa)
+                
+                fecha_inicio = exp.fechainiciogestion.strftime("%m/%Y")
+                fecha_fin = exp.fechafingestion.strftime("%m/%Y") if exp.fechafingestion else "Presente"
+                
+                fechas = Paragraph(
+                    f"{fecha_inicio} - {fecha_fin} | {exp.lugarempresa}",
+                    ParagraphStyle('dates', parent=texto_normal, fontSize=9, textColor=colors.grey)
+                )
+                exp_elementos.append(fechas)
+                
+                if exp.descripcionfunciones:
+                    desc = Paragraph(exp.descripcionfunciones, texto_normal)
+                    exp_elementos.append(desc)
+                
+                exp_elementos.append(Spacer(1, 0.3*cm))
+                
+                elements.append(KeepTogether(exp_elementos))
     
     # ======================================
-    # CERTIFICACIONES
+    # RECONOCIMIENTOS
     # ======================================
     
-    certificaciones = perfil.certificaciones.all()[:5]
-    if certificaciones.exists():
-        elements.append(Spacer(1, 0.3*cm))
-        elements.append(Paragraph("CERTIFICACIONES", seccion_style))
+    if secciones_seleccionadas.get('reconocimientos', False):
+        reconocimientos = perfil.reconocimientos.filter(activarparaqueseveaenfront=True).order_by('-fechareconocimiento')
         
-        for cert in certificaciones:
-            cert_elementos = []
+        if reconocimientos.exists():
+            elements.append(Spacer(1, 0.3*cm))
+            elements.append(Paragraph("RECONOCIMIENTOS", seccion_style))
             
-            # Nombre y entidad
-            nombre_cert = Paragraph(
-                f"<b>{cert.nombre}</b> - {cert.institucion}",
-                texto_bold
-            )
-            cert_elementos.append(nombre_cert)
+            for rec in reconocimientos:
+                rec_elementos = []
+                
+                titulo_rec = Paragraph(
+                    f"<b>{rec.tiporeconocimiento}</b> - {rec.entidadpatrocinadora}",
+                    texto_bold
+                )
+                rec_elementos.append(titulo_rec)
+                
+                fecha_rec = Paragraph(
+                    f"{rec.fechareconocimiento.strftime('%m/%Y')}",
+                    ParagraphStyle('dates', parent=texto_normal, fontSize=9, textColor=colors.grey)
+                )
+                rec_elementos.append(fecha_rec)
+                
+                if rec.descripcionreconocimiento:
+                    desc_rec = Paragraph(rec.descripcionreconocimiento, texto_normal)
+                    rec_elementos.append(desc_rec)
+                
+                rec_elementos.append(Spacer(1, 0.3*cm))
+                
+                elements.append(KeepTogether(rec_elementos))
+    
+    # ======================================
+    # CURSOS REALIZADOS
+    # ======================================
+    
+    if secciones_seleccionadas.get('cursos', False):
+        cursos = perfil.cursos_realizados.filter(activarparaqueseveaenfront=True).order_by('-fechainicio')
+        
+        if cursos.exists():
+            elements.append(Spacer(1, 0.3*cm))
+            elements.append(Paragraph("CURSOS REALIZADOS", seccion_style))
             
-            # Fecha
-            fecha_cert = Paragraph(
-                f"Obtenido: {cert.fecha_obtencion.strftime('%m/%Y')}",
-                ParagraphStyle('dates', parent=texto_normal, fontSize=9, textColor=colors.grey)
-            )
-            cert_elementos.append(fecha_cert)
+            for curso in cursos:
+                curso_elementos = []
+                
+                titulo_curso = Paragraph(
+                    f"<b>{curso.nombrecurso}</b> - {curso.entidadpatrocinadora}",
+                    texto_bold
+                )
+                curso_elementos.append(titulo_curso)
+                
+                fecha_curso = Paragraph(
+                    f"{curso.fechainicio.strftime('%m/%Y')} - {curso.fechafin.strftime('%m/%Y')} | {curso.totalhoras} horas",
+                    ParagraphStyle('dates', parent=texto_normal, fontSize=9, textColor=colors.grey)
+                )
+                curso_elementos.append(fecha_curso)
+                
+                if curso.descripcioncurso:
+                    desc_curso = Paragraph(curso.descripcioncurso, texto_normal)
+                    curso_elementos.append(desc_curso)
+                
+                curso_elementos.append(Spacer(1, 0.3*cm))
+                
+                elements.append(KeepTogether(curso_elementos))
+    
+    # ======================================
+    # PRODUCTOS ACADÉMICOS
+    # ======================================
+    
+    if secciones_seleccionadas.get('productos_academicos', False):
+        productos_acad = perfil.productos_academicos.filter(activarparaqueseveaenfront=True)
+        
+        if productos_acad.exists():
+            elements.append(Spacer(1, 0.3*cm))
+            elements.append(Paragraph("PRODUCTOS ACADÉMICOS", seccion_style))
             
-            # Código
-            if cert.codigo_credencial:
-                codigo = Paragraph(f"Credencial: {cert.codigo_credencial}", texto_normal)
-                cert_elementos.append(codigo)
+            for prod in productos_acad:
+                prod_elementos = []
+                
+                titulo_prod = Paragraph(f"<b>{prod.nombrerecurso}</b>", texto_bold)
+                prod_elementos.append(titulo_prod)
+                
+                if prod.clasificador:
+                    etiquetas = Paragraph(
+                        f"<i>Clasificadores: {prod.clasificador}</i>",
+                        ParagraphStyle('tags', parent=texto_normal, fontSize=9, textColor=colors.grey)
+                    )
+                    prod_elementos.append(etiquetas)
+                
+                if prod.descripcion:
+                    desc_prod = Paragraph(prod.descripcion, texto_normal)
+                    prod_elementos.append(desc_prod)
+                
+                prod_elementos.append(Spacer(1, 0.3*cm))
+                
+                elements.append(KeepTogether(prod_elementos))
+    
+    # ======================================
+    # PRODUCTOS LABORALES
+    # ======================================
+    
+    if secciones_seleccionadas.get('productos_laborales', False):
+        productos_lab = perfil.productos_laborales.filter(activarparaqueseveaenfront=True).order_by('-fechaproducto')
+        
+        if productos_lab.exists():
+            elements.append(Spacer(1, 0.3*cm))
+            elements.append(Paragraph("PRODUCTOS LABORALES", seccion_style))
             
-            cert_elementos.append(Spacer(1, 0.2*cm))
+            for prod in productos_lab:
+                prod_elementos = []
+                
+                titulo_prod = Paragraph(f"<b>{prod.nombreproducto}</b>", texto_bold)
+                prod_elementos.append(titulo_prod)
+                
+                fecha_prod = Paragraph(
+                    f"{prod.fechaproducto.strftime('%m/%Y')}",
+                    ParagraphStyle('dates', parent=texto_normal, fontSize=9, textColor=colors.grey)
+                )
+                prod_elementos.append(fecha_prod)
+                
+                if prod.descripcion:
+                    desc_prod = Paragraph(prod.descripcion, texto_normal)
+                    prod_elementos.append(desc_prod)
+                
+                prod_elementos.append(Spacer(1, 0.3*cm))
+                
+                elements.append(KeepTogether(prod_elementos))
+    
+    # ======================================
+    # VENTA GARAGE
+    # ======================================
+    
+    if secciones_seleccionadas.get('venta_garage', False):
+        ventas = perfil.ventas_garage.filter(activarparaqueseveaenfront=True).order_by('-fecha_publicacion')
+        
+        if ventas.exists():
+            elements.append(Spacer(1, 0.3*cm))
+            elements.append(Paragraph("VENTA GARAGE", seccion_style))
             
-            elements.append(KeepTogether(cert_elementos))
+            for venta in ventas:
+                venta_elementos = []
+                
+                titulo_venta = Paragraph(
+                    f"<b>{venta.nombreproducto}</b> - Estado: {venta.estadoproducto}",
+                    texto_bold
+                )
+                venta_elementos.append(titulo_venta)
+                
+                precio = Paragraph(
+                    f"Precio: ${venta.valordelbien} | Publicado: {venta.fecha_publicacion.strftime('%d/%m/%Y')}",
+                    texto_normal
+                )
+                venta_elementos.append(precio)
+                
+                if venta.descripcion:
+                    desc_venta = Paragraph(venta.descripcion, texto_normal)
+                    venta_elementos.append(desc_venta)
+                
+                venta_elementos.append(Spacer(1, 0.3*cm))
+                
+                elements.append(KeepTogether(venta_elementos))
     
     # ======================================
     # PIE DE PÁGINA
